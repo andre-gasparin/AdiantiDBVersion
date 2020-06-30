@@ -3,7 +3,7 @@
 > Um gerenciador de banco opensource criado por <a href="https://sistemas.gasparimsat.com.br" target="_blank" rel="noopener">sistemas.gasparimsat.com.br</a> com e para Adianti Framework.
 
 <p align="center">
-<img src="https://img.shields.io/badge/VERSÃO-1.0.1-green">
+<img src="https://img.shields.io/badge/VERSÃO-1.0.0-green">
 <img src="https://img.shields.io/badge/Licença-GNU 3.0-success">
 <img src="https://img.shields.io/badge/PHP-GasparimSat-blue">
 <img src="https://img.shields.io/badge/PHP-Adianti-blue">
