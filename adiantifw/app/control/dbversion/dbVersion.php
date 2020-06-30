@@ -1,15 +1,12 @@
 <?php
-/**
- * @author André Gasparin 
- * version 1.1
- * @contributor Fred Azevedo
- * @update 2020-06-27
- * **/
-
-class DbVersion extends TPage
+//POR André Gasparin (pode tirar se quiser, não ligo mesmo kkkk)
+//Quer fuçar no código? sem problema, qualquer modificação por menor que seja pode ajudar o projeto crescer, se não sabe trabalhar com o GIT, me chame que eu lanço a commit!
+//Não fique com vergonha do seu código, ajude com o que sabe, afinal esse mesmo tem diversas funções que possivelmente poderiam ser substituidas por funções mais específicas que não conheço por estar iniciando no FW
+//Não precisa necessariamente ser uma função nova, se você ver algo que fique melhor no código, POR FAVOR, MODIFIQUE e contribua 
+class dbVersion extends TPage
 {
     private $db;
-    static  $dbconnect  = 'sample'; // Ex: samples nome do arquivo de configuração .ini
+    static  $dbver = 'dbversion';
     private $action = array();
 
     public function __construct()
@@ -17,24 +14,24 @@ class DbVersion extends TPage
         parent::__construct();
         try
         {
-            TTransaction::open(self::$dbconnect );
+            TTransaction::open(self::$dbver);
             TTransaction::close();
         }
         catch (Exception $e)
         {
-           new TMessage('error', 'Banco não foi encontrado na aplicação, crie o banco de acordo com a instalação do readme');
+           new TMessage('error', 'Banco dbversion não foi encontrado na aplicação, crie o banco de acordo com a instalação do readme');
         }
     }
 
     public function setDB($db)
     {
         
-        TTransaction::open(self::$dbconnect );
-        $vers = DbConnection::where('name', '=', $db)->count();
-        //Caso a conexão não possua uma versão, setamos ela como 0 e criamos ela no banco de dados do dbconnection 
+        TTransaction::open(self::$dbver);
+        $vers = dbConnection::where('name', '=', $db)->count();
+        //Caso a conexão não possua uma versão, setamos ela como 0 e criamos ela no banco de dados do dbVersion
         if($vers == 0)
         {
-            DbConnection::create( [ 'name' =>  $db, 'version' => '0' ]);
+            dbConnection::create( [ 'name' =>  $db, 'version' => '0' ]);
         }
         TTransaction::close();
             
@@ -44,13 +41,13 @@ class DbVersion extends TPage
     public function verifyVersion()
     {
         
-        TTransaction::open(self::$dbconnect ); // open transaction
+        TTransaction::open(self::$dbver); // open transaction
            
             // query criteria
             $criteria = new TCriteria; 
             $criteria->add(new TFilter('name', '=',  $this->db)); 
             // load using repository
-            $repository = new TRepository('DbConnection'); 
+            $repository = new TRepository('dbConnection'); 
             $version = $repository->load($criteria); 
             //retorna a versão atual da conexão ativa
             return  $version[0]->version;
@@ -60,7 +57,7 @@ class DbVersion extends TPage
     //retorna a última versão existente
     public function verifyNewestVersion()
     {
-        TTransaction::open(self::$dbconnect ); // open transaction
+        TTransaction::open(self::$dbver); // open transaction
             // query criteria, ordena por versão e não por "id" do envio
             $criteria = new TCriteria; 
             $criteria->setProperty('order', 'version');
@@ -68,7 +65,7 @@ class DbVersion extends TPage
             $criteria->setProperty('limit', 1);
 
             // load using repository
-            $repository = new TRepository('DbVer'); 
+            $repository = new TRepository('dbVer'); 
             $version = $repository->load($criteria);
             //retorna a última versão existente 
             return  $version[0]->version;
@@ -116,7 +113,7 @@ class DbVersion extends TPage
         //verifica se existe update para ser feito
         if($this->verifyUpdate())
         {
-            TTransaction::open(self::$dbconnect ); // open transaction
+            TTransaction::open(self::$dbver); // open transaction
                 //Pega os updates na ordem
                 $criteria = new TCriteria; 
                 $criteria->add(new TFilter('version', '>', $this->verifyVersion())); 
@@ -124,9 +121,9 @@ class DbVersion extends TPage
                 $criteria->setProperty('direction','asc');            
 
                 // load using repository
-                $repository = new TRepository('DbVer'); 
+                $repository = new TRepository('dbVer'); 
                 $result = $repository->load($criteria);
-                
+            
                 foreach($result as $row)
                 {
                     if($this->verifyPermission($row->permission))
@@ -156,28 +153,28 @@ class DbVersion extends TPage
     }
 
     //Faz a execução do código, pode ser implementado uma função de debug, assim como aqui no <pre> nas outras funções que retornam "echo"
-    // public function commitVersion($code)
-    // {
-    //     TTransaction::open($this->db);
-    //         $conn = TTransaction::get();
-    //         // if($this->debug) //Precisa implementar
-    //         echo '<pre>'.$code.'</pre>';      
-    //             // else
-    //         $executarSql = $conn->query($code);
-    //         //retorna o status da query
-    //         if($executarSql)
-    //             return true;
-    //         else
-    //             return false;
-    //     TTransaction::close();
-    //     //atualizar base de dados do comit na função de updateVersion, caso o commit retornar true
-    // }
+    public function commitVersion($code)
+    {
+        TTransaction::open($this->db);
+            $conn = TTransaction::get();
+            // if($this->debug) //Precisa implementar
+            echo '<pre>'.$code.'</pre>';      
+                // else
+            $executarSql = $conn->query($code);
+            //retorna o status da query
+            if($executarSql)
+                return true;
+            else
+                return false;
+        TTransaction::close();
+        //atualizar base de dados do comit na função de updateVersion, caso o commit retornar true
+    }
     //Muda a versão da conexão atual no banco de dados do dbVersion
     public function setVersion($versionset)
     {    
-        TTransaction::open(self::$dbconnect); // open transaction
+        TTransaction::open(self::$dbver); // open transaction
             //procura a conexão pelo nome (que é unico)
-            $vers = DbConnection::where('name', '=', $this->db)->load();
+            $vers = dbConnection::where('name', '=', $this->db)->load();
             foreach ($vers as $veral) 
             {
                 //seta a versão no banco 
@@ -187,54 +184,52 @@ class DbVersion extends TPage
         TTransaction::close();
        
     }
+     /* Versão 2.0
     
-    public function commitVersion($code){
-        TTransaction::open(self::$dbconnect); // open transaction
-       
+    
+    public function commitVersion($version){
+        TTransaction::open(self::$dbver); // open transaction
+        
+        
         $criteria = new TCriteria; 
         $criteria->add(new TFilter('id_version', '=', $version)); 
         $criteria->setProperty('order', 'id');
         $criteria->setProperty('direction','asc');            
 
         // load using repository
-        $repository = new TRepository('DbCommit'); 
+        $repository = new TRepository('dbCommit'); 
         $resultc = $repository->load($criteria);
-        
-        if($resultc)
+        foreach($resultc as $rowc)
         {
-            foreach($resultc as $rowc)
-            {
-                //cria a array para separar por tabela deixando as ações das colunas cada um em uma posição da array
-                //ou seja cada coluna pode ter mais de 1 ação, ex. criar e colocar pk
+          
             
-            $act[$rowc->tab][] =
-            [
-                    'colum'         => $rowc->colum,
-                    'target_type'   => $rowc->target_type,
-                    'action'        => $rowc->action,
-                    'target_type'   => $rowc->target_type,
-                    'code'          => $rowc->code,
-                    'prefix'        => $rowc->prefix,
-                    'sufix'         => $rowc->sufix
-                ];
-            }     
-            //separa tabela por tabela, para montar o sql por tabela
-            $sql = array();
-            foreach($act as $tab => $prop){
-                $dbquery = new DbVersionQuery();
-                $dbquery->setTab($tab);
-                $dbquery->setDb($this->db);
-                $dbquery->setDebug(1);
-                //ENVIA coluna por coluna para dividir quais vai inserir, quais vai modificar e quais vai modificar PK
-                foreach($prop as $key => $value){
-                    $dbquery->setColumn($value);
-                }
-            $dbquery->run();
+            //cria a array para separar por tabela deixando as ações das colunas cada um em uma posição da array
+            //ou seja cada coluna pode ter mais de 1 ação, ex. criar e colocar pk
+           $action[$rowc->tab][] =
+           [
+                'column'        => $rowc->column,
+                'target_type'   => $rowc->target_type,
+                'action'        => $rowc->action,
+                'target_type'   => $rowc->target_type,
+                'code'          => $rowc->code,
+                'prefix'        => $rowc->prefix,
+                'sufix'         => $rowc->sufix
+            ];
+        }     
+        //separa tabela por tabela, para montar o sql por tabela
+        $sql = array();
+        foreach($action as $tab => $prop){
+            $dbquery = new dbVersionQuery();
+            $dbquery->setTab($tab);
+            $dbquery->setDb($this->db);
+            $dbquery->setDebug(1);
+            //ENVIA coluna por coluna para dividir quais vai inserir, quais vai modificar e quais vai modificar PK
+            foreach($prop as $key => $value){
+                $dbquery->setColumn($value);
             }
-        }else{
-            echo "Repository vazio!";
+           $dbquery->run();
         }
         TTransaction::close();
     }
-    
+    */
 }

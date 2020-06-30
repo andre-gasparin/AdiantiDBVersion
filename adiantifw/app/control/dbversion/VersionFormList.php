@@ -1,19 +1,13 @@
 <?php
-/**
- * @author André Gasparin 
- * @version 1.1
- * @contributor Fred Azevedo
- * @update 2020-06-27
- * **/
-
+//POR André Gasparin utilizando o builder grátuito :D pra agilizar (pode tirar se quiser, não ligo mesmo kkkk)
 class VersionFormList extends TPage
 {
     private $form; // form
     private $datagrid; // listing
     private $pageNavigation;
     private $loaded;
-    private static $dbconnect = 'sample'; // Ex: samples nome do arquivo de configuração .ini
-    private static $activeRecord = 'DbVer';
+    private static $database = 'dbversion';
+    private static $activeRecord = 'dbVer';
     private static $primaryKey = 'id';
     private static $formName = 'form_list_Version';
 
@@ -126,9 +120,9 @@ class VersionFormList extends TPage
             if (isset($param['key']))
             {
                 $key = $param['key'];  // get the parameter $key
-                TTransaction::open(self::$dbconnect); // open a transaction
+                TTransaction::open(self::$database); // open a transaction
 
-                $object = new DbVer($key); // instantiates the Active Record 
+                $object = new dbVer($key); // instantiates the Active Record 
 
                 $this->form->setData($object); // fill the form 
 
@@ -153,13 +147,13 @@ class VersionFormList extends TPage
             {
                 // get the paramseter $key
                 $key = $param['key'];
-                // open a transaction with dbconnect
-                TTransaction::open(self::$dbconnect);
+                // open a transaction with database
+                TTransaction::open(self::$database);
 
                 // instantiates object
-                $object = new DbVer($key, FALSE); 
+                $object = new dbVer($key, FALSE); 
 
-                // deletes the object from the dbconnect
+                // deletes the object from the database
                 $object->delete();
 
                 // close the transaction
@@ -192,13 +186,13 @@ class VersionFormList extends TPage
     {
         try
         {
-            TTransaction::open(self::$dbconnect); // open a transaction
+            TTransaction::open(self::$database); // open a transaction
 
             $messageAction = null;
 
             $this->form->validate(); // validate form data
 
-            $object = new DbVer(); // create an empty object 
+            $object = new dbVer(); // create an empty object 
 
             $data = $this->form->getData(); // get form data as array
             $object->fromArray( (array) $data); // load the object with data
@@ -231,8 +225,8 @@ class VersionFormList extends TPage
     {
         try
         {
-            // open a transaction with dbconnect 'dbversion'
-            TTransaction::open(self::$dbconnect);
+            // open a transaction with database 'dbversion'
+            TTransaction::open(self::$database);
 
             // creates a repository for Version
             $repository = new TRepository(self::$activeRecord);
@@ -323,3 +317,4 @@ class VersionFormList extends TPage
     }
 
 }
+
