@@ -13,6 +13,10 @@
 Agora você não precisa mais atualizar base por base do seu cliente (multibancos, multischemas), coloque no login ou na página inicial conforme a instalação que assim que logado o sistema irá fazer o update do banco de dados de acordo com as conexões que você permitiu no formulário.
 Ele irá fazer as atualizações na sequencia, ou seja, caso crie uma conexão do 0, ele vai passar por todas as versões e criar um banco do 0 que passará por todas atualizações até a versão atual da produção.
 
+## Colaboração
+
+Fred Azevedo
+
 
 ## Instalação
 
@@ -81,6 +85,13 @@ Caso queira implementar algo no sistema, utilize os padrões do Adianti Framewor
 
 * 1.0.0
     * Projeto criado
+
+* 1.0.1
+    * Alteração em nome de variáveis
+    * Alteração em nome de classes
+    * Alteração em nome de arquivos
+    * Revisão do código
+
 
 ## Meta
 

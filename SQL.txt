@@ -1,9 +1,6 @@
 
 -- Table: connection
-CREATE TABLE connection (id INTEGER PRIMARY KEY UNIQUE NOT NULL, name VARCHAR (10), version VARCHAR (10));
+CREATE TABLE up_connection (id INTEGER PRIMARY KEY UNIQUE NOT NULL, name VARCHAR (10), version VARCHAR (10));
 
 -- Table: version
-CREATE TABLE version (id PRIMARY KEY UNIQUE, version DOUBLE UNIQUE, code TEXT, permission TEXT);
-
--- Table: version_commits
-CREATE TABLE version_commits (id PRIMARY KEY UNIQUE NOT NULL, id_version CHAR REFERENCES version (version), "action" CHAR, target_type CHAR, "column" VARCHAR, tab VARCHAR, code TEXT, prefix VARCHAR, sufix VARCHAR);
+CREATE TABLE up_version (id PRIMARY KEY UNIQUE, version DOUBLE UNIQUE, code TEXT, permission TEXT);
